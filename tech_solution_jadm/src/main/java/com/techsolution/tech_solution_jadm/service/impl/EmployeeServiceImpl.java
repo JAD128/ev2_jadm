@@ -7,7 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.techsolution.tech_solution_jadm.dto.EmployeeRequest;
 import com.techsolution.tech_solution_jadm.dto.EmployeeResponse;
+import com.techsolution.tech_solution_jadm.entity.Department;
 import com.techsolution.tech_solution_jadm.entity.Employee;
+import com.techsolution.tech_solution_jadm.repository.DepartmentRepository;
 import com.techsolution.tech_solution_jadm.repository.EmployeeRepository;
 import com.techsolution.tech_solution_jadm.service.EmployeeService;
 
@@ -15,9 +17,12 @@ import com.techsolution.tech_solution_jadm.service.EmployeeService;
 @Transactional
 public class EmployeeServiceImpl implements EmployeeService {
 
+    private final DepartmentRepository departmentRepository;
     private final EmployeeRepository repository;
-    public EmployeeServiceImpl(EmployeeRepository repository) {
+
+    public EmployeeServiceImpl(EmployeeRepository repository, DepartmentRepository departmentRepository) {
         this.repository = repository;
+        this.departmentRepository = departmentRepository;
     }
 
     private EmployeeResponse toResponse(Employee employee) {
@@ -27,6 +32,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         response.setName(employee.getName());
         response.setPosition(employee.getPosition());
         response.setSalary(employee.getSalary());
+
+        if (employee.getDepartment() != null) {
+            response.setDepartmentId(employee.getDepartment().getId());
+            response.setDepartmentName(employee.getDepartment().getName());
+        }
 
         return response;
     }
@@ -39,8 +49,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setPosition(request.getPosition());
         employee.setSalary(request.getSalary());
 
+        if (request.getDepartmentId() != null) {
+            Department department = departmentRepository.findById(request.getDepartmentId())
+                    .orElseThrow(() -> new RuntimeException("Department " + request.getDepartmentId() + " not found"));
+            
+            employee.setDepartment(department);
+        }
+        
         Employee saved = repository.save(employee);
-
         return toResponse(saved);
     }
 
@@ -49,4 +65,5 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<EmployeeResponse> list() {
         return repository.findAll().stream().map(this::toResponse).toList();
     }
+
 }

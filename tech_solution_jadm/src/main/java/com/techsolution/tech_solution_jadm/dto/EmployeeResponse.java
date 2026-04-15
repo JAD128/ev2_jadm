@@ -7,6 +7,11 @@ public class EmployeeResponse {
     private String position;
     private Double salary;
 
+    //Department 
+    private Long departmentId;
+    private String departmentName;
+
+    //Getters and setters
     public Long getId() {
         return id;
     }
@@ -38,5 +43,21 @@ public class EmployeeResponse {
     public void setSalary(Double salary) {
         this.salary = salary;
     }
-}
 
+    //Depatment
+    public Long getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+}
